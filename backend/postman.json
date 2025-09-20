@@ -1,0 +1,476 @@
+{
+  "info": {
+    "name": "Voice Biometric Recognition API",
+    "description": "Complete API testing for Voice Biometric Recognition & Synthetic Voice Detection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Login - Get JWT Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('auth_token', response.access_token);",
+                  "    pm.test('Login successful', function () {",
+                  "        pm.expect(response.access_token).to.be.a('string');",
+                  "    });",
+                  "} else {",
+                  "    pm.test('Login failed', function () {",
+                  "        pm.expect.fail('Login should succeed');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"officer\",\n  \"password\": \"police123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Inmate Management",
+      "item": [
+        {
+          "name": "Create Inmate - John Doe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('inmate_id', response.id);",
+                  "    pm.test('Inmate created successfully', function () {",
+                  "        pm.expect(response.inmate_code).to.eql('INM001');",
+                  "        pm.expect(response.name).to.eql('John Doe');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "John Doe",
+                  "type": "text"
+                },
+                {
+                  "key": "inmate_code",
+                  "value": "INM001",
+                  "type": "text"
+                },
+                {
+                  "key": "reference_audio",
+                  "type": "file",
+                  "src": "john_reference.wav",
+                  "description": "Upload a WAV file here"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/inmates",
+              "host": ["{{base_url}}"],
+              "path": ["inmates"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Inmate - Jane Smith",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Jane Smith",
+                  "type": "text"
+                },
+                {
+                  "key": "inmate_code",
+                  "value": "INM002",
+                  "type": "text"
+                },
+                {
+                  "key": "reference_audio",
+                  "type": "file",
+                  "src": "jane_reference.wav",
+                  "description": "Upload a WAV file here"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/inmates",
+              "host": ["{{base_url}}"],
+              "path": ["inmates"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Inmates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmates",
+              "host": ["{{base_url}}"],
+              "path": ["inmates"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Specific Inmate",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmates/{{inmate_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["inmates", "{{inmate_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Audio Analysis",
+      "item": [
+        {
+          "name": "Upload Audio - Voice Match Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('report_id', response.report_id);",
+                  "    pm.collectionVariables.set('report_code', response.report_code);",
+                  "    pm.test('Audio analysis completed', function () {",
+                  "        pm.expect(response.report_code).to.include('DFA-');",
+                  "        pm.expect(response.synthetic_confidence).to.be.a('number');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "audio",
+                  "type": "file",
+                  "src": "test_call.wav",
+                  "description": "Audio file to analyze"
+                },
+                {
+                  "key": "inmate_code",
+                  "value": "INM001",
+                  "type": "text",
+                  "description": "Compare against specific inmate"
+                },
+                {
+                  "key": "claimed_caller",
+                  "value": "John Doe",
+                  "type": "text"
+                },
+                {
+                  "key": "context",
+                  "value": "Intercepted phone call from prison",
+                  "type": "text"
+                },
+                {
+                  "key": "provided_by",
+                  "value": "Surveillance Team Alpha",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/upload",
+              "host": ["{{base_url}}"],
+              "path": ["upload"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Audio - Unknown Caller",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "audio",
+                  "type": "file",
+                  "src": "unknown_caller.wav",
+                  "description": "Audio file to analyze"
+                },
+                {
+                  "key": "claimed_caller",
+                  "value": "Unknown Person",
+                  "type": "text"
+                },
+                {
+                  "key": "context",
+                  "value": "Anonymous tip call",
+                  "type": "text"
+                },
+                {
+                  "key": "provided_by",
+                  "value": "Tip Hotline",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/upload",
+              "host": ["{{base_url}}"],
+              "path": ["upload"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Audio - Suspected Synthetic",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "audio",
+                  "type": "file",
+                  "src": "synthetic_voice.wav",
+                  "description": "Suspected AI-generated audio"
+                },
+                {
+                  "key": "claimed_caller",
+                  "value": "John Doe",
+                  "type": "text"
+                },
+                {
+                  "key": "context",
+                  "value": "Suspicious call claiming to be inmate",
+                  "type": "text"
+                },
+                {
+                  "key": "provided_by",
+                  "value": "Digital Forensics Unit",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/upload",
+              "host": ["{{base_url}}"],
+              "path": ["upload"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Reports Management",
+      "item": [
+        {
+          "name": "Get All Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports",
+              "host": ["{{base_url}}"],
+              "path": ["reports"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get JSON Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/{{report_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "{{report_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download PDF Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/{{report_id}}/pdf",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "{{report_id}}", "pdf"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Report Signature",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/{{report_id}}/verify",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "{{report_id}}", "verify"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. System Health",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "API Documentation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/docs",
+              "host": ["{{base_url}}"],
+              "path": ["docs"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
