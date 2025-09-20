@@ -170,12 +170,12 @@ cython_debug/
 *.wma
 
 # Data directories
-data/
-uploads/
-audio_files/
-demo_audio/
-spectrograms/
-reports/
+# data/
+# uploads/
+# audio_files/
+# demo_audio/
+# spectrograms/
+# reports/
 
 # Database files
 *.db
