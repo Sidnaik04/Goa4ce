@@ -262,3 +262,5 @@ test_data/
 # Generated PDFs and reports
 *.pdf
 report_*.json
+
+frontend/

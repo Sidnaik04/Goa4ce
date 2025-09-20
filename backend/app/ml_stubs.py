@@ -6,25 +6,132 @@ import uuid
 from typing import List, Tuple
 import json
 import matplotlib
+import torch
+import torchaudio
+from speechbrain.inference import EncoderClassifier
+import warnings
 
 matplotlib.use("Agg")  # Use non-GUI backend
 import matplotlib.pyplot as plt
 
+# Global variable to hold the model (singleton pattern)
+_speaker_encoder = None
 
-# generate voice embedding from audio files
+
+def _get_speaker_encoder():
+    """
+    Initialize and return the SpeechBrain speaker encoder model.
+    This uses a singleton pattern to avoid reloading the model on every request.
+    """
+    global _speaker_encoder
+    if _speaker_encoder is None:
+        try:
+            print("Loading SpeechBrain speaker encoder model...")
+            _speaker_encoder = EncoderClassifier.from_hparams(
+                source="speechbrain/spkrec-ecapa-voxceleb",
+                savedir="pretrained_models/spkrec-ecapa-voxceleb"
+            )
+            print("SpeechBrain model loaded successfully!")
+        except Exception as e:
+            print(f"Error loading SpeechBrain model: {e}")
+            raise e
+    return _speaker_encoder
+
+
+def _convert_to_wav(audio_path: str) -> str:
+    """
+    Convert audio file to WAV format if needed.
+    Returns path to WAV file (original if already WAV, or converted temp file).
+    """
+    if audio_path.lower().endswith('.wav'):
+        return audio_path
+    
+    try:
+        # Load audio with torchaudio (supports mp3, flac, etc.)
+        waveform, sample_rate = torchaudio.load(audio_path)
+        
+        # Create temporary WAV file
+        temp_wav_path = audio_path.rsplit('.', 1)[0] + '_temp.wav'
+        
+        # Save as WAV
+        torchaudio.save(temp_wav_path, waveform, sample_rate)
+        
+        return temp_wav_path
+    except Exception as e:
+        print(f"Error converting audio file {audio_path}: {e}")
+        raise ValueError(f"Unable to process audio file: {e}")
+
+
 def get_embedding(audio_path: str) -> List[float]:
-    with open(audio_path, "rb") as f:
-        file_hash = hashlib.md5(f.read()).hexdigest()
-
-        random.seed(file_hash)
-
-        embedding = [random.uniform(-1, -1) for _ in range(256)]
-
-        return embedding
+    """
+    Generate voice embedding from audio file using SpeechBrain ECAPA-TDNN model.
+    
+    Args:
+        audio_path: Path to audio file (supports .wav, .mp3, .flac, .m4a, .ogg)
+    
+    Returns:
+        List of floats representing the voice embedding (192-dimensional)
+    
+    Raises:
+        ValueError: If audio file cannot be processed
+        FileNotFoundError: If audio file doesn't exist
+    """
+    if not os.path.exists(audio_path):
+        raise FileNotFoundError(f"Audio file not found: {audio_path}")
+    
+    temp_wav_path = None
+    try:
+        # Get the speaker encoder model
+        encoder = _get_speaker_encoder()
+        
+        # Convert to WAV if needed
+        wav_path = _convert_to_wav(audio_path)
+        temp_wav_path = wav_path if wav_path != audio_path else None
+        
+        # Generate embedding using SpeechBrain
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            
+            # The model expects the audio file path
+            signal = encoder.load_audio(wav_path)
+            embedding = encoder.encode_batch(signal)
+            
+            # Convert tensor to numpy array and flatten
+            if isinstance(embedding, torch.Tensor):
+                embedding_np = embedding.squeeze().detach().cpu().numpy()
+            else:
+                embedding_np = np.array(embedding).flatten()
+            
+            # Convert to Python list
+            embedding_list = embedding_np.tolist()
+            
+        return embedding_list
+        
+    except Exception as e:
+        print(f"Error generating embedding for {audio_path}: {e}")
+        raise ValueError(f"Failed to generate embedding: {e}")
+    
+    finally:
+        # Clean up temporary WAV file if created
+        if temp_wav_path and os.path.exists(temp_wav_path):
+            try:
+                os.remove(temp_wav_path)
+            except:
+                pass
 
 
 # compare two voice embeddings using cosine similarity
 def compare_embeddings(a: List[float], b: List[float]) -> float:
+    """
+    Compare two voice embeddings using cosine similarity.
+    
+    Args:
+        a: First embedding (list of floats)
+        b: Second embedding (list of floats)
+    
+    Returns:
+        Similarity score between 0.0 and 1.0
+    """
     # convert to numpy arrays
     vec_a = np.array(a)
     vec_b = np.array(b)
@@ -38,6 +145,7 @@ def compare_embeddings(a: List[float], b: List[float]) -> float:
 
     cosine_similarity = dot_product / (norm_a * norm_b)
     
+    # Normalize to 0-1 range
     similarity = max(0.0, min(1.0, (cosine_similarity + 1) / 2))
 
     return float(similarity)
@@ -45,6 +153,15 @@ def compare_embeddings(a: List[float], b: List[float]) -> float:
 
 # detect if audio us synthetic/AI-generated
 def detect_synthetic(audio_path: str) -> Tuple[bool, float]:
+    """
+    Detect if audio is synthetic/AI-generated (stub implementation).
+    
+    Args:
+        audio_path: Path to audio file
+    
+    Returns:
+        Tuple of (is_synthetic: bool, confidence: float)
+    """
     with open(audio_path, "rb") as f:
         file_hash = hashlib.md5(f.read()).hexdigest()
 
@@ -63,6 +180,15 @@ def detect_synthetic(audio_path: str) -> Tuple[bool, float]:
 
 # generate spectrogram image from audio file
 def generate_spectrogram(audio_path: str) -> str:
+    """
+    Generate spectrogram image from audio file.
+    
+    Args:
+        audio_path: Path to audio file
+    
+    Returns:
+        Path to generated spectrogram image
+    """
     file_id = str(uuid.uuid4())
     output_path = f"data/spectrograms/spectrogram_{file_id}.png"
 
@@ -103,8 +229,17 @@ def generate_spectrogram(audio_path: str) -> str:
     return output_path
 
 
-# extraxt basic audio features for analysis
+# extract basic audio features for analysis
 def get_audio_features(audio_path: str) -> dict:
+    """
+    Extract basic audio features for analysis (stub implementation).
+    
+    Args:
+        audio_path: Path to audio file
+    
+    Returns:
+        Dictionary of audio features
+    """
     file_size = os.path.getsize(audio_path)
 
     features = {
