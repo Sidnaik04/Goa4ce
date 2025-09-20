@@ -1,17 +1,8 @@
 from fastapi import APIRouter, UploadFile, File
 from fastapi.responses import JSONResponse
-import torch
-import librosa
-import numpy as np
-import os
-import hashlib
-import datetime
-import io
-import soundfile as sf
-import matplotlib.pyplot as plt
-import base64
-import librosa.display
+import torch, librosa, numpy as np, os, hashlib, datetime, io, soundfile as sf
 from transformers import AutoFeatureExtractor, AutoModelForAudioClassification
+from app.reporting import generate_report
 
 router = APIRouter()
 
@@ -21,8 +12,7 @@ model_names = [
     "Gustking/wav2vec2-large-xlsr-deepfake-audio-classification"
 ]
 
-models = []
-feature_extractors = []
+models, feature_extractors = [], []
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 for name in model_names:
@@ -41,8 +31,8 @@ os.makedirs("reports", exist_ok=True)
 
 # ---------------- Settings ---------------- #
 SAMPLE_RATE = 16000
-CHUNK_DURATION = 3        # seconds per chunk
-CHUNK_OVERLAP = 0.5       # 50% overlap
+CHUNK_DURATION = 3
+CHUNK_OVERLAP = 0.5
 
 # ---------------- Utilities ---------------- #
 def load_audio(file_bytes, target_sr=SAMPLE_RATE):
@@ -82,50 +72,26 @@ def extract_metadata(file_bytes, filename):
         "date_of_file_creation": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M GMT")
     }
 
-def generate_heatmap(audio, sr, probs, chunk_index, filename):
-    S = librosa.feature.melspectrogram(y=audio, sr=sr, n_mels=128)
-    S_db = librosa.power_to_db(S, ref=np.max)
-    plt.figure(figsize=(8, 4))
-    librosa.display.specshow(S_db, sr=sr, x_axis='time', y_axis='mel')
-    plt.colorbar(format='%+2.0f dB')
-    plt.title(f"Chunk {chunk_index+1} Deepfake Score: {probs[1]:.2f}")
-    img_path = os.path.join("reports", f"{filename}_heatmap_chunk{chunk_index+1}.png")
-    plt.savefig(img_path)
-    plt.close()
-    with open(img_path, "rb") as img_file:
-        return base64.b64encode(img_file.read()).decode("utf-8")
-
-# ---------------- Voice Classification ---------------- #
+# ---------------- Classification ---------------- #
 def classify_voice(probs):
     genuine, deepfake = probs
-
-    # Clearly AI
     if deepfake > 0.55:
         return "AI / Synthetic Voice"
-    
-    # Clearly Human or borderline (anything not AI and not extremely low confidence)
     elif genuine >= 0.4 and deepfake <= 0.55:
         return "Human Voice"
-    
-    # Low confidence, unclear
     elif max(probs) < 0.4:
         return "Uncertain"
-    
-    # Any other rare case
     else:
         return "Noise / Other"
 
-
-
 def aggregate_verdict(chunk_results):
-    # If any chunk is AI, mark AI
     if any(c['prediction'] == "AI / Synthetic Voice" for c in chunk_results):
-        return "🔴 AI / Synthetic Detected"
+        return "AI / Synthetic Detected"
     if any(c['prediction'] == "Human Voice" for c in chunk_results):
-        return "🟢 Human Voice"
+        return "Human Voice"
     if any(c['prediction'] == "Noise / Other" for c in chunk_results):
-        return "🟡 Noise / Other"
-    return "🟠 Uncertain"
+        return "Noise / Other"
+    return "Uncertain"
 
 # ---------------- Predict Endpoint ---------------- #
 @router.post("/predict/")
@@ -152,14 +118,13 @@ async def predict_audio(file: UploadFile = File(...)):
 
             ensemble_probs = np.mean(model_probs, axis=0)
             predicted_label = classify_voice(ensemble_probs)
-            heatmap_b64 = generate_heatmap(chunk, SAMPLE_RATE, ensemble_probs, idx, file.filename)
 
             chunk_results.append({
                 "chunk_index": idx+1,
                 "prediction": predicted_label,
                 "genuine_score": float(ensemble_probs[0]),
                 "deepfake_score": float(ensemble_probs[1]),
-                "heatmap": heatmap_b64
+                "audio_chunk_for_pdf": chunk  # Only used for PDF
             })
 
         final_verdict = aggregate_verdict(chunk_results)
@@ -174,7 +139,16 @@ async def predict_audio(file: UploadFile = File(...)):
             "final_verdict": final_verdict
         }
 
-        return JSONResponse(report)
+        report_files = generate_report(audio_path, report)
+
+        # Remove raw audio before returning JSON
+        for c in report["chunk_results"]:
+            c.pop("audio_chunk_for_pdf", None)
+
+        return JSONResponse({
+            "report_data": report,
+            "report_files": report_files
+        })
 
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)

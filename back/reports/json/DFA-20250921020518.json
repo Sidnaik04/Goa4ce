@@ -1,0 +1,33 @@
+{
+    "report_id": "DFA-20250921020518",
+    "file_name": "clip-Andrew.wav",
+    "date": "2025-09-20 20:35:18",
+    "results": [
+        {
+            "chunk_index": 1,
+            "prediction": "AI / Synthetic Voice",
+            "genuine_score": 0.1797925978899002,
+            "deepfake_score": 0.820207417011261
+        },
+        {
+            "chunk_index": 2,
+            "prediction": "Human Voice",
+            "genuine_score": 0.5550286769866943,
+            "deepfake_score": 0.4449712932109833
+        },
+        {
+            "chunk_index": 3,
+            "prediction": "Human Voice",
+            "genuine_score": 0.5458125472068787,
+            "deepfake_score": 0.45418745279312134
+        },
+        {
+            "chunk_index": 4,
+            "prediction": "Human Voice",
+            "genuine_score": 0.5794578790664673,
+            "deepfake_score": 0.4205421209335327
+        }
+    ],
+    "final_verdict": "AI / Synthetic Detected",
+    "md5_hash": "3ff5c07c473f22b2d8f17616c8b26c89"
+}

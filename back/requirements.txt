@@ -26,3 +26,9 @@ safetensors>=0.4.0,<0.5
 # Additional for accuracy
 resampy>=0.4.0,<0.5
 numba>=0.60.0,<0.61
+
+matplotlib
+qrcode
+reportlab
+fpdf
+seaborn
