@@ -78,7 +78,7 @@ async def root():
 
                     // Display only final verdict and PDF link
                     let html = `<h3>Final Verdict: ${data.report_data.final_verdict}</h3>`;
-                    html += `<p><a href="${data.report_files.pdf_report}" target="_blank">📄 Download PDF Report</a></p>`;
+                    html += `<p><a href="${pdf_report}" target="_blank">📄 Download PDF Report</a></p>`;
                     resultsDiv.innerHTML = html;
 
                 } catch (err) {

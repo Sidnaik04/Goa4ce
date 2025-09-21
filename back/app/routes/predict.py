@@ -27,7 +27,6 @@ for name in model_names:
 
 # ---------------- Folders ---------------- #
 os.makedirs("uploads", exist_ok=True)
-os.makedirs("reports", exist_ok=True)
 
 # ---------------- Settings ---------------- #
 SAMPLE_RATE = 16000
@@ -92,6 +91,8 @@ def aggregate_verdict(chunk_results):
     first_chunk = chunk_results[0]
     # Final verdict is strictly based on classify_voice for the first chunk
     return classify_voice([first_chunk['genuine_score'], first_chunk['deepfake_score']])
+# ...existing code...
+
 @router.post("/predict/")
 async def predict_audio(file: UploadFile = File(...)):
     try:
@@ -107,7 +108,7 @@ async def predict_audio(file: UploadFile = File(...)):
         if not chunks:
             chunks = [load_audio(file_bytes)[0]]  # fallback for very short audio
 
-        # Compute first chunk scores
+        chunk_results = []
         first_chunk_scores = None
         for idx, chunk in enumerate(chunks):
             model_probs = []
@@ -123,16 +124,30 @@ async def predict_audio(file: UploadFile = File(...)):
             if idx == 0:
                 first_chunk_scores = ensemble_probs
 
-        final_verdict = classify_voice(first_chunk_scores) if first_chunk_scores is not None else "Uncertain"
+            chunk_results.append({
+                "chunk_index": idx + 1,
+                "genuine_score": float(ensemble_probs[0]),
+                "deepfake_score": float(ensemble_probs[1]),
+                "prediction": classify_voice(ensemble_probs)
+            })
 
-        # Build report (no chunk_results)
+        final_verdict = classify_voice(first_chunk_scores) if first_chunk_scores is not None else "Uncertain"
+        avg_deepfake_score = float(np.mean([c["deepfake_score"] for c in chunk_results])) if chunk_results else None
+        avg_genuine_score = float(np.mean([c["genuine_score"] for c in chunk_results])) if chunk_results else None  # <-- ADD THIS LINE
+
+        # Build enhanced report
         report = {
             "report_id": f"DFA-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}",
             "date_of_analysis": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "analyzed_by": "Automated AI Tool",
             "tool_used": model_names,
             "audio_metadata": metadata,
-            "final_verdict": final_verdict
+            "final_verdict": final_verdict,
+            "average_deepfake_score": avg_deepfake_score,
+            "average_genuine_score": avg_genuine_score,  # <-- ADD THIS LINE
+            "device_used": str(device),
+            "chunks_analyzed": len(chunk_results),
+            "chunk_results": chunk_results
         }
 
         report_files = generate_report(audio_path, report)
@@ -144,3 +159,5 @@ async def predict_audio(file: UploadFile = File(...)):
 
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
+
+# ...existing code...
