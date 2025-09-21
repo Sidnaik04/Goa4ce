@@ -41,10 +41,7 @@ async def root():
             h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
             .btn { background: #3498db; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
             .btn:hover { background: #2980b9; }
-            #results { margin-top: 20px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-            th, td { border: 1px solid #bdc3c7; padding: 8px; text-align: center; }
-            th { background: #3498db; color: white; }
+            #results { margin-top: 20px; text-align: center; }
         </style>
     </head>
     <body>
@@ -58,13 +55,16 @@ async def root():
         <script>
             async function analyzeAudio() {
                 const fileInput = document.getElementById('audioFile');
-                if (!fileInput.files.length) { alert("Please select an audio file!"); return; }
-                
+                const resultsDiv = document.getElementById('results');
+                if (!fileInput.files.length) { 
+                    alert("Please select an audio file!"); 
+                    return; 
+                }
+
                 const file = fileInput.files[0];
                 const formData = new FormData();
                 formData.append("file", file);
 
-                const resultsDiv = document.getElementById('results');
                 resultsDiv.innerHTML = "<p>Analyzing... ⏳</p>";
 
                 try {
@@ -72,21 +72,15 @@ async def root():
                     const data = await response.json();
 
                     if (data.error) {
-                        resultsDiv.innerHTML = "<p style='color:red;'>" + data.error + "</p>";
+                        resultsDiv.innerHTML = `<p style="color:red;">${data.error}</p>`;
                         return;
                     }
 
+                    // Display only final verdict and PDF link
                     let html = `<h3>Final Verdict: ${data.report_data.final_verdict}</h3>`;
-                    html += "<h4>Chunk Analysis:</h4>";
-                    html += "<table><tr><th>Chunk</th><th>Prediction</th><th>Genuine Score</th><th>Deepfake Score</th></tr>";
-
-                    data.report_data.chunk_results.forEach((chunk, idx) => {
-                        html += `<tr><td>${idx+1}</td><td>${chunk.prediction}</td><td>${chunk.genuine_score.toFixed(2)}</td><td>${chunk.deepfake_score.toFixed(2)}</td></tr>`;
-                    });
-                    html += "</table>";
-
                     html += `<p><a href="${data.report_files.pdf_report}" target="_blank">📄 Download PDF Report</a></p>`;
                     resultsDiv.innerHTML = html;
+
                 } catch (err) {
                     resultsDiv.innerHTML = "<p style='color:red;'>Error analyzing audio</p>";
                     console.error(err);
@@ -99,4 +93,4 @@ async def root():
 
 if __name__ == "__main__":
     os.makedirs("uploads", exist_ok=True)
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.r

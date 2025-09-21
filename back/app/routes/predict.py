@@ -85,15 +85,13 @@ def classify_voice(probs):
         return "Noise / Other"
 
 def aggregate_verdict(chunk_results):
-    if any(c['prediction'] == "AI / Synthetic Voice" for c in chunk_results):
-        return "AI / Synthetic Detected"
-    if any(c['prediction'] == "Human Voice" for c in chunk_results):
-        return "Human Voice"
-    if any(c['prediction'] == "Noise / Other" for c in chunk_results):
-        return "Noise / Other"
-    return "Uncertain"
-
-# ---------------- Predict Endpoint ---------------- #
+    # Use the classify_voice result of the first chunk (or main chunk) directly
+    if not chunk_results:
+        return "Uncertain"
+    
+    first_chunk = chunk_results[0]
+    # Final verdict is strictly based on classify_voice for the first chunk
+    return classify_voice([first_chunk['genuine_score'], first_chunk['deepfake_score']])
 @router.post("/predict/")
 async def predict_audio(file: UploadFile = File(...)):
     try:
@@ -103,9 +101,14 @@ async def predict_audio(file: UploadFile = File(...)):
             f.write(file_bytes)
 
         metadata = extract_metadata(file_bytes, file.filename)
-        chunks = preprocess_audio(file_bytes)
-        chunk_results = []
 
+        # Preprocess audio
+        chunks = preprocess_audio(file_bytes)
+        if not chunks:
+            chunks = [load_audio(file_bytes)[0]]  # fallback for very short audio
+
+        # Compute first chunk scores
+        first_chunk_scores = None
         for idx, chunk in enumerate(chunks):
             model_probs = []
             for extractor, model in zip(feature_extractors, models):
@@ -117,33 +120,22 @@ async def predict_audio(file: UploadFile = File(...)):
                 model_probs.append(probs)
 
             ensemble_probs = np.mean(model_probs, axis=0)
-            predicted_label = classify_voice(ensemble_probs)
+            if idx == 0:
+                first_chunk_scores = ensemble_probs
 
-            chunk_results.append({
-                "chunk_index": idx+1,
-                "prediction": predicted_label,
-                "genuine_score": float(ensemble_probs[0]),
-                "deepfake_score": float(ensemble_probs[1]),
-                "audio_chunk_for_pdf": chunk  # Only used for PDF
-            })
+        final_verdict = classify_voice(first_chunk_scores) if first_chunk_scores is not None else "Uncertain"
 
-        final_verdict = aggregate_verdict(chunk_results)
-
+        # Build report (no chunk_results)
         report = {
             "report_id": f"DFA-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}",
             "date_of_analysis": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "analyzed_by": "Automated AI Tool",
             "tool_used": model_names,
             "audio_metadata": metadata,
-            "chunk_results": chunk_results,
             "final_verdict": final_verdict
         }
 
         report_files = generate_report(audio_path, report)
-
-        # Remove raw audio before returning JSON
-        for c in report["chunk_results"]:
-            c.pop("audio_chunk_for_pdf", None)
 
         return JSONResponse({
             "report_data": report,
