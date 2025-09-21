@@ -1,0 +1,54 @@
+{
+    "report_id": "DFA-20250921132344",
+    "file_name": "clip-Luna-2025_09_20.wav",
+    "date": "2025-09-21 07:53:44",
+    "final_verdict": "AI / Synthetic Voice",
+    "md5_hash": "4ef498f6eb3203c0b6db0e4b6594d453",
+    "audio_metadata": {
+        "file_name": "clip-Luna-2025_09_20.wav",
+        "file_format": "wav",
+        "duration": "0 min 8 sec",
+        "sampling_rate": "16000 Hz",
+        "md5_hash": "4ef498f6eb3203c0b6db0e4b6594d453",
+        "date_of_file_creation": "2025-09-21 07:53 GMT"
+    },
+    "tool_used": [
+        "mo-thecreator/Deepfake-audio-detection",
+        "Gustking/wav2vec2-large-xlsr-deepfake-audio-classification"
+    ],
+    "average_deepfake_score": 0.5648220419883728,
+    "device_used": "cpu",
+    "chunks_analyzed": 5,
+    "chunk_results": [
+        {
+            "chunk_index": 1,
+            "genuine_score": 0.4391280710697174,
+            "deepfake_score": 0.560871958732605,
+            "prediction": "AI / Synthetic Voice"
+        },
+        {
+            "chunk_index": 2,
+            "genuine_score": 0.43304502964019775,
+            "deepfake_score": 0.5669549703598022,
+            "prediction": "AI / Synthetic Voice"
+        },
+        {
+            "chunk_index": 3,
+            "genuine_score": 0.44367656111717224,
+            "deepfake_score": 0.5563234090805054,
+            "prediction": "AI / Synthetic Voice"
+        },
+        {
+            "chunk_index": 4,
+            "genuine_score": 0.4145418405532837,
+            "deepfake_score": 0.5854582190513611,
+            "prediction": "AI / Synthetic Voice"
+        },
+        {
+            "chunk_index": 5,
+            "genuine_score": 0.4454983174800873,
+            "deepfake_score": 0.5545016527175903,
+            "prediction": "AI / Synthetic Voice"
+        }
+    ]
+}

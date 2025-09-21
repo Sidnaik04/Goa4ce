@@ -1,0 +1,23 @@
+{
+    "report_id": "DFA-20250921171022",
+    "file_name": "clip-Andrew-2025_09_20.wav",
+    "date": "2025-09-21 11:40:24",
+    "final_verdict": "AI / Synthetic Voice",
+    "md5_hash": "3ff5c07c473f22b2d8f17616c8b26c89",
+    "audio_metadata": {
+        "file_name": "clip-Andrew-2025_09_20.wav",
+        "file_format": "wav",
+        "duration": "0 min 7 sec",
+        "sampling_rate": "16000 Hz",
+        "md5_hash": "3ff5c07c473f22b2d8f17616c8b26c89",
+        "date_of_file_creation": "2025-09-21 11:40 GMT"
+    },
+    "tool_used": [
+        "mo-thecreator/Deepfake-audio-detection",
+        "Gustking/wav2vec2-large-xlsr-deepfake-audio-classification"
+    ],
+    "average_deepfake_score": 0.5349771603941917,
+    "average_genuine_score": 0.46502285078167915,
+    "device_used": "cpu",
+    "chunks_analyzed": 4
+}

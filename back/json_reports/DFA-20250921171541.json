@@ -1,0 +1,23 @@
+{
+    "report_id": "DFA-20250921171541",
+    "file_name": "Akanksha.mp3",
+    "date": "2025-09-21 11:45:41",
+    "final_verdict": "Human Voice",
+    "md5_hash": "48cbc74793e6b3f78598ab9483f42cbe",
+    "audio_metadata": {
+        "file_name": "Akanksha.mp3",
+        "file_format": "mp3",
+        "duration": "0 min 28 sec",
+        "sampling_rate": "16000 Hz",
+        "md5_hash": "48cbc74793e6b3f78598ab9483f42cbe",
+        "date_of_file_creation": "2025-09-21 11:45 GMT"
+    },
+    "tool_used": [
+        "mo-thecreator/Deepfake-audio-detection",
+        "Gustking/wav2vec2-large-xlsr-deepfake-audio-classification"
+    ],
+    "average_deepfake_score": 0.3518419408876645,
+    "average_genuine_score": 0.6481580655825766,
+    "device_used": "cpu",
+    "chunks_analyzed": 19
+}

@@ -20,6 +20,4 @@ requests
 speechbrain
 torch
 torchaudio
-
-
-
+transformers
