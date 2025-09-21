@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from typing import Optional, List, Dict, Any
 import uuid
-from . import models, ml_stubs
+from app import models, ml_stubs
+from app.utils import make_json_serializable
 
 
 # create a new inmate
@@ -104,11 +105,15 @@ def create_report(
     speaker_match_confidence: float,
     sha256: str,
     md5: Optional[str] = None,
-    metadata: Optional[Dict] = None,
+    call_metadata: Optional[Dict] = None,
     claimed_caller: Optional[str] = None,
     context: Optional[str] = None,
     provided_by: Optional[str] = None,
 ) -> models.Report:
+
+    safe_call_metadata = (
+        make_json_serializable(call_metadata) if call_metadata is not None else None
+    )
 
     db_report = models.Report(
         report_code=report_code,
@@ -121,7 +126,7 @@ def create_report(
         speaker_match_confidence=speaker_match_confidence,
         sha256=sha256,
         md5=md5,
-        metadata=metadata,
+        call_metadata=safe_call_metadata,
         claimed_caller=claimed_caller,
         context=context,
         provided_by=provided_by,
