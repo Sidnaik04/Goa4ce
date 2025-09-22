@@ -1,0 +1,23 @@
+{
+    "report_id": "DFA-20250921160715",
+    "file_name": "test.mp3",
+    "date": "2025-09-21 10:37:15",
+    "final_verdict": "Human Voice",
+    "md5_hash": "d14b8d216e6dff69045a4b31c50e5cc8",
+    "audio_metadata": {
+        "file_name": "test.mp3",
+        "file_format": "mp3",
+        "duration": "0 min 13 sec",
+        "sampling_rate": "16000 Hz",
+        "md5_hash": "d14b8d216e6dff69045a4b31c50e5cc8",
+        "date_of_file_creation": "2025-09-21 10:37 GMT"
+    },
+    "tool_used": [
+        "mo-thecreator/Deepfake-audio-detection",
+        "Gustking/wav2vec2-large-xlsr-deepfake-audio-classification"
+    ],
+    "average_deepfake_score": 0.037264450970623225,
+    "average_genuine_score": 0.9627355270915561,
+    "device_used": "cpu",
+    "chunks_analyzed": 9
+}

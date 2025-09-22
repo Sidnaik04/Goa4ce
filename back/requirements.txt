@@ -1,0 +1,34 @@
+# Core
+fastapi>=0.115.2,<0.116
+uvicorn[standard]>=0.23.0,<0.24
+python-multipart>=0.0.6,<0.1
+
+# PyTorch (latest stable)
+torch>=2.6.0,<2.7
+torchaudio>=2.6.0,<2.7
+torchvision>=0.21.0,<0.22
+
+# Audio processing
+librosa>=0.10.1,<0.11
+soundfile>=0.12.1,<0.13
+pydub>=0.25.1,<0.26
+
+# ML & Statistical
+scikit-learn>=1.3.0,<1.4
+scipy>=1.11.0,<1.12
+numpy>=1.26.0,<1.28.0
+statsmodels>=0.14.0,<0.15
+
+# Transformers & HF models
+transformers>=4.44.0,<5.0.0
+safetensors>=0.4.0,<0.5
+
+# Additional for accuracy
+resampy>=0.4.0,<0.5
+numba>=0.60.0,<0.61
+
+matplotlib
+qrcode
+reportlab
+fpdf
+seaborn

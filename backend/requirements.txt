@@ -17,3 +17,7 @@ passlib[bcrypt]
 Pillow
 PyJWT
 requests
+speechbrain
+torch
+torchaudio
+transformers
