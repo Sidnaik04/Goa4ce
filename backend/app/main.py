@@ -13,9 +13,11 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional, List
 import shutil
 from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 
 from app import models, schemas, crud, ml_stubs, utils
 from app.database import SessionLocal, engine
+from app.predict import router as predict_router
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -63,6 +65,10 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
+app.include_router(predict_router, prefix="/api/v1", tags=["detection"])
+app.mount("/pdf_reports", StaticFiles(directory="pdf_reports"), name="pdf_reports")
+
+
 # login
 @app.post("/auth/login", response_model=schemas.Token)
 async def login(credentials: schemas.UserCredentials):
@@ -93,8 +99,10 @@ async def create_inmate(
 ):
     print(f"Received: name={name}, inmate_code={inmate_code}")
     print(f"File: {reference_audio.filename if reference_audio else 'None'}")
-    print(f"Content-Type: {reference_audio.content_type if reference_audio else 'None'}")
-    
+    print(
+        f"Content-Type: {reference_audio.content_type if reference_audio else 'None'}"
+    )
+
     existing = crud.get_inmate_by_code(db, inmate_code)
     if existing:
         raise HTTPException(status_code=400, detail="Inmate code already exists")
@@ -368,3 +376,6 @@ async def root():
             "GET /reports/{id}/verify - Verify report signature",
         ],
     }
+
+if __name__ == "__main__":
+    os.makedirs("backend/uploads", exist_ok=True)
