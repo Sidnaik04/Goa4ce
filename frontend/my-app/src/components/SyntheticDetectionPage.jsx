@@ -174,18 +174,15 @@ const SyntheticDetectionPage = () => {
                 className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
               >
                 <ArrowLeft className="h-5 w-5" />
-                <span>Back to Dashboard</span>
-              </button>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              <div className="bg-indigo-100 p-2 rounded-full">
-                <Shield className="h-8 w-8 text-indigo-600" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">GOA POLICE</h1>
-                <p className="text-sm text-gray-600">Synthetic Voice Detection</p>
-              </div>
+                </button>
+        <div>
+          <h1 className="text-xl font-semibold text-gray-900">
+            Goa Police - Synthetic Voice Detection
+          </h1>
+          <p className="text-sm text-gray-500">
+            Audio and Deepfake Detection System
+          </p>
+        </div>
             </div>
           </div>
         </div>
@@ -195,20 +192,20 @@ const SyntheticDetectionPage = () => {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
-            <div className="bg-gradient-to-br from-purple-500 to-pink-600 p-4 rounded-2xl">
-              <Waves className="h-12 w-12 text-white" />
-            </div>
+            <img 
+              src="/synthetic.png" 
+              alt="Synthetic Voice Detection" 
+              className="h-32 w-auto object-contain" 
+            />
           </div>
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Synthetic Voice Detection
           </h2>
-          <p className="text-lg text-gray-600">
-            AI-Generated Audio and Deepfake Detection System
-          </p>
-        </div>
+          </div>
 
         {/* Analysis Form */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+         <div className="bg-white rounded-2xl shadow-lg border-2 border-purple-300 hover:border-purple-500 
+                transition-all duration-200 overflow-hidden mb-8">
           <div className="p-8">
             {/* Error Message */}
             {error && (
@@ -230,9 +227,13 @@ const SyntheticDetectionPage = () => {
               </label>
               <div className="flex items-center justify-center w-full">
                 <label
-                  htmlFor="audio-file"
-                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
-                >
+  htmlFor="audio-file"
+  className="flex flex-col items-center justify-center w-full h-32 
+             border-2 border-dashed border-gray-400 rounded-lg cursor-pointer 
+             bg-gray-50 hover:bg-gray-100 
+             transition-all duration-200
+             hover:border-purple-500 hover:shadow-md"
+>
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     {audioFile ? (
                       <>
@@ -407,6 +408,57 @@ const SyntheticDetectionPage = () => {
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+<footer className="bg-gray-900 text-gray-300 border-t border-gray-800 mt-auto">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* About Section */}
+      <div>
+        <h3 className="text-white font-semibold mb-3">Goa Police</h3>
+        <p className="text-sm text-gray-400 leading-relaxed">
+          Digital Forensics Platform for voice analysis, biometric verification, and synthetic audio detection.
+        </p>
+      </div>
+      
+      {/* Quick Links */}
+      <div>
+        <h3 className="text-white font-semibold mb-3">Quick Links</h3>
+        <ul className="space-y-2 text-sm">
+          <li><a href="/dashboard" className="hover:text-violet-400 transition-colors">Dashboard</a></li>
+          <li><a href="/voice-biometric" className="hover:text-violet-400 transition-colors">Voice Analysis</a></li>
+          <li><a href="/synthetic-detection" className="hover:text-violet-400 transition-colors">Synthetic Detection</a></li>
+        </ul>
+      </div>
+      
+      {/* Legal */}
+      <div>
+        <h3 className="text-white font-semibold mb-3">Legal & Security</h3>
+        <ul className="space-y-2 text-sm">
+          <li className="flex items-center">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+            Forensic-Grade Analysis
+          </li>
+          <li className="flex items-center">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+            Court Admissible Reports
+          </li>
+          <li className="flex items-center">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+            End-to-End Encryption
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    {/* Bottom Bar */}
+    <div className="border-t border-gray-800 mt-8 pt-6 text-sm text-center text-gray-500">
+      <p>&copy; 2025 Goa Police Department. All rights reserved. For official law enforcement use only.</p>
+    </div>
+  </div>
+</footer>
+
+
     </div>
   );
 };
