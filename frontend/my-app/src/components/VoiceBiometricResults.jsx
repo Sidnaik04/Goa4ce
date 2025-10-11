@@ -39,7 +39,7 @@ const VoiceBiometricResults = () => {
     return new Date(dateString).toLocaleString();
   };
 
-  return (
+   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">

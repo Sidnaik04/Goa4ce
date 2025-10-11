@@ -124,6 +124,7 @@ def get_embedding(audio_path: str) -> List[float]:
 def compare_embeddings(a: List[float], b: List[float]) -> float:
     """
     Compare two voice embeddings using cosine similarity.
+    Handles embeddings of different dimensions by padding/truncating.
     
     Args:
         a: First embedding (list of floats)
@@ -132,23 +133,62 @@ def compare_embeddings(a: List[float], b: List[float]) -> float:
     Returns:
         Similarity score between 0.0 and 1.0
     """
-    # convert to numpy arrays
+    # Convert to numpy arrays
     vec_a = np.array(a)
     vec_b = np.array(b)
+    
+    # Handle dimension mismatch
+    if vec_a.shape[0] != vec_b.shape[0]:
+        print(f"Warning: Embedding dimension mismatch ({vec_a.shape[0]} vs {vec_b.shape[0]})")
+        
+        # Option 1: Pad the shorter vector with zeros
+        max_len = max(vec_a.shape[0], vec_b.shape[0])
+        if vec_a.shape[0] < max_len:
+            vec_a = np.pad(vec_a, (0, max_len - vec_a.shape[0]), mode='constant')
+        if vec_b.shape[0] < max_len:
+            vec_b = np.pad(vec_b, (0, max_len - vec_b.shape[0]), mode='constant')
+        
+        # Option 2: Alternatively, truncate to the shorter length
+        # min_len = min(vec_a.shape[0], vec_b.shape[0])
+        # vec_a = vec_a[:min_len]
+        # vec_b = vec_b[:min_len]
 
-    dot_product = np.dot(vec_a, vec_b)
+    # Calculate norms
     norm_a = np.linalg.norm(vec_a)
     norm_b = np.linalg.norm(vec_b)
 
     if norm_a == 0 or norm_b == 0:
         return 0.0
 
+    # Calculate cosine similarity
+    dot_product = np.dot(vec_a, vec_b)
     cosine_similarity = dot_product / (norm_a * norm_b)
     
     # Normalize to 0-1 range
     similarity = max(0.0, min(1.0, (cosine_similarity + 1) / 2))
 
     return float(similarity)
+
+
+def validate_embedding_dimensions(embeddings_dict: dict) -> bool:
+    """
+    Validate that all embeddings have consistent dimensions.
+    
+    Args:
+        embeddings_dict: Dictionary of embeddings to validate
+    
+    Returns:
+        True if all dimensions match, False otherwise
+    """
+    if not embeddings_dict:
+        return True
+    
+    dimensions = [len(emb) for emb in embeddings_dict.values()]
+    if len(set(dimensions)) > 1:
+        print(f"Warning: Inconsistent embedding dimensions found: {set(dimensions)}")
+        return False
+    
+    return True
 
 
 # detect if audio us synthetic/AI-generated

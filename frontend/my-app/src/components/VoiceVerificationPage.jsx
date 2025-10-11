@@ -192,7 +192,9 @@ const VoiceVerificationPage = () => {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-2xl shadow-xl border border-violet-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-xl border-2 border-purple-300 
+                hover:border-purple-500 transition-all duration-200 overflow-hidden">
+
           {/* Form Section */}
           <div className="p-8">
             <div className="mb-8">
@@ -355,6 +357,57 @@ const VoiceVerificationPage = () => {
           )}
         </div>
       </div>
+
+      {/* Footer */}
+<footer className="bg-gray-900 text-gray-300 border-t border-gray-800 mt-auto">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* About Section */}
+      <div>
+        <h3 className="text-white font-semibold mb-3">Goa Police</h3>
+        <p className="text-sm text-gray-400 leading-relaxed">
+          Digital Forensics Platform for voice analysis, biometric verification, and synthetic audio detection.
+        </p>
+      </div>
+      
+      {/* Quick Links */}
+      <div>
+        <h3 className="text-white font-semibold mb-3">Quick Links</h3>
+        <ul className="space-y-2 text-sm">
+          <li><a href="/dashboard" className="hover:text-violet-400 transition-colors">Dashboard</a></li>
+          <li><a href="/voice-biometric" className="hover:text-violet-400 transition-colors">Voice Analysis</a></li>
+          <li><a href="/synthetic-detection" className="hover:text-violet-400 transition-colors">Synthetic Detection</a></li>
+        </ul>
+      </div>
+      
+      {/* Legal */}
+      <div>
+        <h3 className="text-white font-semibold mb-3">Legal & Security</h3>
+        <ul className="space-y-2 text-sm">
+          <li className="flex items-center">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+            Forensic-Grade Analysis
+          </li>
+          <li className="flex items-center">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+            Court Admissible Reports
+          </li>
+          <li className="flex items-center">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+            End-to-End Encryption
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    {/* Bottom Bar */}
+    <div className="border-t border-gray-800 mt-8 pt-6 text-sm text-center text-gray-500">
+      <p>&copy; 2025 Goa Police Department. All rights reserved. For official law enforcement use only.</p>
+    </div>
+  </div>
+</footer>
+
+
     </div>
   );
 };

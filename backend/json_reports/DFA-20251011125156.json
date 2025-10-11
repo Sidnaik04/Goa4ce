@@ -1,0 +1,19 @@
+{
+    "report_id": "DFA-20251011125156",
+    "file_name": "test.mp3",
+    "date": "2025-10-11 07:21:56",
+    "final_verdict": "🟢 Human Voice",
+    "md5_hash": "d14b8d216e6dff69045a4b31c50e5cc8",
+    "audio_metadata": {
+        "duration": 13.653375,
+        "sampling_rate": 16000
+    },
+    "tool_used": [
+        "mo-thecreator/Deepfake-audio-detection",
+        "Gustking/wav2vec2-large-xlsr-deepfake-audio-classification"
+    ],
+    "average_deepfake_score": 0.037149406141704984,
+    "average_genuine_score": 0.962890625,
+    "device_used": "cuda",
+    "chunks_analyzed": 9
+}

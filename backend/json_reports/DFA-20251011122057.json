@@ -1,0 +1,19 @@
+{
+    "report_id": "DFA-20251011122057",
+    "file_name": "aryan.mp3",
+    "date": "2025-10-11 06:50:57",
+    "final_verdict": "🟢 Human Voice",
+    "md5_hash": "1e1191a4ec1de0f48faa9da97664cdd8",
+    "audio_metadata": {
+        "duration": 24.055875,
+        "sampling_rate": 16000
+    },
+    "tool_used": [
+        "mo-thecreator/Deepfake-audio-detection",
+        "Gustking/wav2vec2-large-xlsr-deepfake-audio-classification"
+    ],
+    "average_deepfake_score": 0.4712413102388382,
+    "average_genuine_score": 0.5287372525781393,
+    "device_used": "cuda",
+    "chunks_analyzed": 16
+}

@@ -1,0 +1,19 @@
+{
+    "report_id": "DFA-20251011130710",
+    "file_name": "Meher.mp3",
+    "date": "2025-10-11 07:37:10",
+    "final_verdict": "🟢 Human Voice",
+    "md5_hash": "a5bfb3515a7af64de0909fe5d4b0346e",
+    "audio_metadata": {
+        "duration": 33.6426875,
+        "sampling_rate": 16000
+    },
+    "tool_used": [
+        "mo-thecreator/Deepfake-audio-detection",
+        "Gustking/wav2vec2-large-xlsr-deepfake-audio-classification"
+    ],
+    "average_deepfake_score": 0.4931374477303546,
+    "average_genuine_score": 0.5069196470405745,
+    "device_used": "cuda",
+    "chunks_analyzed": 23
+}

@@ -26,11 +26,12 @@ app = FastAPI(title="ps3 ka Backend", version="1.0.0")
 # cors middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173"],  # your frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 security = HTTPBearer()
 
